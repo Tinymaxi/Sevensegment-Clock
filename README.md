@@ -23,14 +23,22 @@ The small two-digit seconds display on the right is a different animal — a con
 seven-segment display driven through a **74HC595 shift register**, clocked out bit by bit in
 `hc595_shift()` over three GPIO lines (SDI, RCLK, SRCLK).
 
+The **dots along the bottom** are the other way of watching the seconds: one dot travels
+across the display and back again, one step per second, so you can see time passing out of
+the corner of your eye without reading anything.
+
 **The button** on top (GPIO 20) picks seven new random colours every time you press it. No
 menu, no configuration — press it until you like what you see.
+
+**Keeping time.** A Pi Zero has no real-time clock, so a **cron job syncs the system time
+twice a day**, once in the morning and once in the afternoon. That's enough to keep the drift
+invisible without the clock needing an RTC of its own.
 
 ---
 
 ## Hardware
 
-- Raspberry Pi
+- Raspberry Pi Zero
 - 32 NeoPixels arranged as four seven-segment digits plus dots, on GPIO 10
 - 74HC595 shift register driving a two-digit seven-segment display for the seconds
 - One push button on GPIO 20
@@ -51,8 +59,7 @@ gpiozero
 python3 timepiv11.py
 ```
 
-It reads the system clock, so the time is only as good as the Pi's — worth pointing at NTP
-or adding an RTC if it's going to run offline.
+It reads the system clock, which the cron job keeps honest — see above.
 
 ---
 
