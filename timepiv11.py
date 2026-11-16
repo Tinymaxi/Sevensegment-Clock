@@ -1,25 +1,27 @@
+#!/usr/bin/python
 from datetime import datetime
 import time
 from time import sleep
 import board
 import neopixel
-import RPi.GPIO as GPIO
-##from multiprocessing import Process
+import RPi.GPIO as  GPIO
 from gpiozero import Button
 from random import randint
+import sys
+from subprocess import check_call
+from signal import pause
 
-button = Button(20)
+button = Button(20, hold_time=5)
+
 
 """Sets Neopixels up on the Raspberrypi and enables the use of 32 Neopixels."""
-pixels = neopixel.NeoPixel(board.D10, 32, brightness=0.9, auto_write=True)
+pixels = neopixel.NeoPixel(board.D18, 32, brightness=0.9, auto_write = True)
 
 
 
-""" sets the value to the Neopixels to set a collor
-r = 100, g = 0, b = 100 makes the color pink."""
-r = 100
-g = 0
-b = 100
+"""Suhtdown"""
+def shutdown():
+    check_call(['sudo', 'poweroff'])
 
 
 def change_colors():
@@ -37,27 +39,6 @@ def change_colors():
 t,x,y,z,u,v,w=(change_colors())
 
 button.when_pressed = change_colors
-
-
-##def display_color(seconds):
-##    """changes the color of all pixels when it reaches a surten number"""
-##    if seconds < 10:
-##        r = 120
-##        g = 0
-##        b = 0 
-##    elif seconds > 10:
-##        r = 0
-##        g = 120
-##        b = 0
-##    elif seconds == 20:
-##        r = 0
-##        g = 0
-##        b = 120
-##        global r
-##        global g
-##        global b
-##        return r,g,b
-
 
 
 def digit_seconds():
@@ -80,7 +61,7 @@ def digit_minutes(f):
         text = str('%02d' %(currentMinute))
         firstdigit = text[f]
         return(int(firstdigit))
-        
+
 
 def digit_hours(e):
     """Generates a one digit number which
@@ -91,7 +72,7 @@ def digit_hours(e):
         text = str('%02d' %(currentHour))
         firstdigit = text[e]
         return(int(firstdigit))
-        
+
 #pixel numbers and actual number form functions
 def number(r,g,b,h,i,j,k,l,m,n,number):
     """ Takes the pixelnumbers and the actual number from the above
@@ -104,7 +85,7 @@ def number(r,g,b,h,i,j,k,l,m,n,number):
         pixels[l] = (r, g, b)
         pixels[m] = (r, g, b)
         pixels[n] = (0, 0, 0)
-        
+
     elif number == 1:
         pixels[h] = (0, 0, 0)
         pixels[i] = (r, g, b)
@@ -406,36 +387,12 @@ def dots(r,g,b,x):
         pixels[31] = (0, 0, 0)
 
 
-"""
-Set up pins for dezimal
-SDI   = 19
-RCLK  = 13
-SRCLK = 6
-Set up pins for singular"""
-
-SDI   = 18
+SDI   = 23
 RCLK  = 27
 SRCLK = 22
 
-"""Original code with out dots"""
-##segCode = [0x6D6f,0x6D7f,0x6D07,0x6D7d,0x6D6d,0x6D66,0x6D4f,0x6D5b,0x6d06,0x6d3f,
-##           0x666f,0x667f,0x6607,0x667d,0x666d,0x6666,0x664f,0x665b,0x6606,0x663f,
-##           0x4f6f,0x4f7f,0x4f07,0x4f7d,0x4f6d,0x4f66,0x4f4f,0x4f5b,0x4f06,0x4f3f,
-##           0x5b6f,0x5b7f,0x5b07,0x5b7d,0x5b6d,0x5b66,0x5b4f,0x5b5b,0x5b06,0x5b3f,
-##           0x066f,0x067f,0x0607,0x067d,0x066d,0x0666,0x064f,0x065b,0x0606,0x063f,
-##           0x3f6f,0x3f7f,0x3f07,0x3f7d,0x3f6d,0x3f66,0x3f4f,0x3f5b,0x3f06,0x3f3f,]
-
 """ This list contains the rows of zero and one which are passed to the shiftregister
 to display the corrosponding number from 0 to 60"""
-##segCode = [0x6D6f,0x6D7f,0x6D07,0xeD7d,0x6Ded,0xeD66,0x6D4f,0x6D5b,0x6d06,0x6d3f,
-##           0x666f,0x667f,0x6607,0xe67d,0x66ed,0xe666,0x664f,0x665b,0x6606,0x663f,
-##           0x4f6f,0x4f7f,0x4f07,0xcf7d,0x4fed,0xcf66,0x4f4f,0x4f5b,0x4f06,0x4f3f,
-##           0x5b6f,0x5b7f,0x5b07,0xdb7d,0x5bed,0xdb66,0x5b4f,0x5b5b,0x5b06,0x5b3f,
-##           0x066f,0x067f,0x0607,0x867d,0x06ed,0x8666,0x064f,0x065b,0x0606,0x063f,
-##           0x3f6f,0x3f7f,0x3f07,0xbf7d,0x3fed,0xbf66,0x3f4f,0x3f5b,0x3f06,0x3f3f,]
-
-
-
 
 segCode = [0x6f6D,0x7f6D,0x076D,0x7deD,0xed6D,0x66eD,0x4f6D,0x5b6D,0x066D,0x3f6D, 
            0x6f66,0x7f66,0x0766,0x7de6,0xed66,0x66e6,0x4f66,0x5b66,0x0666,0x3f66, 
@@ -468,23 +425,49 @@ def hc595_shift(dat):
 
 
 def main():
-    while True:
+   while True:
         """calls the funktions and passes in the parameters."""
 #        print(digit_hours(0),digit_hours(1),digit_minutes(0),digit_minutes(1),digit_seconds())
 
-#        display_color(100,20,30,digit_seconds())
-        
+
+
         Seconds = digit_seconds()
         dat = segCode[-Seconds-1]
         hc595_shift(dat)
-           
-        number(x,y,z,0,1,2,3,4,5,6,digit_hours(0))        
+
+        if (digit_hours(0) > 0):
+            number(x,y,z,0,1,2,3,4,5,6,digit_hours(0))
+        elif (digit_hours(0) == 0):
+            pixels[0] = (0,0,0)
+            pixels[1] = (0,0,0)
+            pixels[2] = (0,0,0)
+            pixels[3] = (0,0,0)
+            pixels[4] = (0,0,0)
+            pixels[5] = (0,0,0)
+            pixels[6] = (0,0,0)
+
+
+
+
+
+
+
         number(x,y,z,8,9,10,11,12,13,14,digit_hours(1))
         number(u,v,w,16,17,18,19,20,21,22,digit_minutes(0))        
+
         number(u,v,w,24,25,26,27,28,29,30,digit_minutes(1))
 
-        dots(t,y,w,digit_seconds())        
-#        time.sleep(0.33)
+        dots(t,y,w,digit_seconds())
+#        sys.stdout.flush()
+#        pixels.fill((0,0,0))
+#        sleep(0.01)
+
+
+        shutdown_btn = button
+        shutdown_btn.when_held = shutdown
+
+
+
 def destroy():
     """Stuff I don't realy understand"""
     GPIO.cleanup()
@@ -492,9 +475,13 @@ def destroy():
 if __name__ == '__main__':
         setup()
         try:
-            
+
             main()
-                
+
+#            c.close()
+#            GPIO.cleanup()
+
         except:
+            destroy()
             pass
 
