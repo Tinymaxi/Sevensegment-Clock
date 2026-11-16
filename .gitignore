@@ -1,0 +1,34 @@
+# This folder holds more than the repository. Everything below stays on the
+# computer and is not uploaded to GitHub.
+
+# SD card images of the clock (15 GB each)
+*.img
+
+# datasheets, pin diagrams, wiring and CAD files
+*.pdf
+*.PNG
+*.stl
+*.dxf
+*.fzz
+/Geh*use Siebensegment Uhr/
+
+# an older copy of this folder
+/Siebensegment Uhr/
+
+# earlier and in-between versions of the clock script, and small test scripts
+/timepi.py
+/timepiv3.py
+/timepiv4.py
+/timepiv9.py
+/timepiv10.py
+/timepiv12.py
+/timepiv13.py
+/timepiv14.py
+/blinkatest.py
+/sec.py
+/shutdown.py
+
+# clutter
+.DS_Store
+__pycache__/
+.claude/
